@@ -40,11 +40,3 @@ steps of 0.25% and the monthly outflow is calculated for each of the interest
 rates.
 * Monthly budget: This is the maximum amount that you can set aside towards
 housing payments each month. This will be depicted using a dash-dot line. 
-
-Contact Me
-----------
-
-If you would like to collaborate with me in improving this program or if
-there any bugs, please reach out to me at `arunmano121@out***k.com` (OR)
-feel free to fork and add any enhancements, and let me know if a pull
-request is needed to merge the changes.

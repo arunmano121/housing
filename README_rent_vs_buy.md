@@ -67,12 +67,3 @@ Assumptions
   a value that reflects your situation.
 * The down payment amount that was set aside for the buying scenario is
   assumed to be fully invested for the renting scenario. 
-
-
-Contact Me
-----------
-
-If you would like to collaborate with me in improving this program or if
-there any bugs, please reach out to me at `arunmano121@out***k.com` (OR)
-feel free to fork and add any enhancements, and let me know if a pull
-request is needed to merge the changes.
