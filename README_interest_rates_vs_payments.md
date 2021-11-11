@@ -31,6 +31,9 @@ or 15 years, etc.
 older properties to as much as $1000 for newer properties and communities.
 * Maintenance: Monthly maintenance cost - varies between property. Typically,
 around $200.
+* Property tax percentage: Property tax rate determines the monthly property
+tax and the approximate home insurance rates. In the San Diego area, the
+rates are around 1.25% annual. 
 * Tax bracket: Since mortgage insurance and property tax are tax deductible,
 enter your approximate tax bracket in percentage - typically varies between
 10% - 40%.

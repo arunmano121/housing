@@ -567,8 +567,8 @@ def get_user_input():
     # Monthly maintenance
     params['maint'] = int(input('Monthly maintenance ($): '))
 
-    # monthly property tax is assumed to be 1.25%
-    params['prop_tax'] = 1.25
+    # monthly property tax - typically around 1.25% in San Diego, CA area
+    params['prop_tax'] = float(input('Enter property tax percentage (%): '))
 
     # Approximate tax bracket (property tax and mortgage insurance are
     # tax deductible)
@@ -605,8 +605,8 @@ def main():
 
     The parameters that are involved in calculating the monthly parameters
     are home value, down payment, loan term, interest rate, monthly HOA,
-    maintenance, property tax and home insurance (which are roughly based
-    on the property tax rates (1.25%)).
+    maintenance, property tax and home insurance (which are based
+    on the property tax rates).
 
     Other parameters involved in modeling are rent appreciation, property
     appreciation, investment returns, tax bracket, number of years, etc.
