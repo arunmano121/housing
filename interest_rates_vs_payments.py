@@ -142,10 +142,6 @@ def main():
     # monthly property tax - typically around 1.25% in San Diego, CA area
     prop_tax_pct = float(input('Enter property tax percentage (%): '))
 
-    # Approximate tax bracket (property tax and mortgage insurance are
-    # tax deductible)
-    tax_bkt = int(input('Enter approximate tax bracket (%): '))
-
     # interest rate - simulate between desired interest rate range in
     # steps of 0.25%
     msg = 'Enter interest rate range seperated by (-): '
@@ -165,12 +161,9 @@ def main():
     # monthly home insurance
     home_ins = prop_tax_pct / (12*100) * home_val / 10
 
-    # monthly tax break based on mortgage interest and property tax
-    tax_break = tax_bkt / 100 * (prop_tax + interest)
-
     # total monthly commitment is sum of payment to bank, hoa, home ins and
-    # prop tax, maintenance with tax break removed
-    mon_commit = payment + hoa + home_ins + prop_tax + maint - tax_break
+    # prop tax, maintenance
+    mon_commit = payment + hoa + home_ins + prop_tax + maint
 
     # plots the results including the range of interest rates on x-axis
     # monthly commitment on the y-axis for the different home prices.
