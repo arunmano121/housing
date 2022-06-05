@@ -2,9 +2,8 @@ This program calculates the schedule of payments given mortgage parameters.
 It outputs the monthly schedule of payments to an excel file, and also
 graphically represents the composition of payments. 
 
-This program does not account for any tax breaks, property appreciation and
-any other maintenance expenses. It also assumes fixed mortgage interest rates
-for the life of loan. 
+This program does not account for any tax breaks and property appreciation.
+It also assumes fixed mortgage interest rates for the life of loan. 
 
 Input parameters
 ----------------
@@ -17,6 +16,8 @@ Input parameters
   or 15 years, etc.
 * HOA/Mello-Roos: Monthly HOA and Mello-Roos. Typically, varies between $0 for
   older properties to as much as $1000 for newer properties and communities.
+* Maintenance: Monthly maintenance charges. Typically, varies between $350 to
+  $1000 for older properties, to as little as $0 for newer properties.
 * Annual interest rate: Specify the annual interest rate for your mortagage.
   Varies between 2%-15%. 
 * Property tax percentage: Property tax rate determines the monthly property
