@@ -34,9 +34,6 @@ around $200.
 * Property tax percentage: Property tax rate determines the monthly property
 tax and the approximate home insurance rates. In the San Diego area, the
 rates are around 1.25% annual. 
-* Tax bracket: Since mortgage insurance and property tax are tax deductible,
-enter your approximate tax bracket in percentage - typically varies between
-10% - 40%.
 * Annual interest rate: Specify the annual interest rate for your mortagage.
 Varies between 2%-15%. The range is split between lower and upper bound in
 steps of 0.25% and the monthly outflow is calculated for each of the interest
