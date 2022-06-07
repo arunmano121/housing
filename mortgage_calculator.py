@@ -415,7 +415,7 @@ def main():
 
     # total interest over the life of loan
     tot_int = sum(int_h)
-    print('Total interest payment over %d months: $%0.2f' %
+    print('\nTotal interest payment over %d months: $%0.2f' %
           (years*12, tot_int))
 
     # total property tax over the life of loan
@@ -445,11 +445,11 @@ def main():
 
     # ratio of interest to money borrowed from bank
     int_loan_rat = tot_int/loan_amt*100
-    print('Interest-Loan Ratio: %0.2f%%' % (int_loan_rat))
+    print('\nInterest-Loan Ratio: %0.2f%%' % (int_loan_rat))
 
     # interest that is paid over the first 7 years
     int_7yr = sum(int_h[0:7*12])
-    print('Interest paid over the first 7 years: $%0.2f' % (int_7yr))
+    print('\nInterest paid over the first 7 years: $%0.2f' % (int_7yr))
 
     # Proportion of interest that is paid over the first 7 years
     int_7yr_tot_rat = int_7yr / tot_int * 100
@@ -459,6 +459,25 @@ def main():
     # Outstanding principal after first 7 years
     out_prin_7yr = out_prin_h[7*12-1]
     print('Outstanding principal after 7 years: $%0.2f' % (out_prin_7yr))
+
+    # Principal paid in 7 years
+    print('Principal paid in 7 years: $%0.2f' % (loan_amt - out_prin_7yr))
+
+    # interest that is paid over the first 10 years
+    int_10yr = sum(int_h[0:10*12])
+    print('\nInterest paid over the first 10 years: $%0.2f' % (int_10yr))
+
+    # Proportion of interest that is paid over the first 10 years
+    int_10yr_tot_rat = int_10yr / tot_int * 100
+    print('Proportion of total interest paid in first 10 years: %0.2f%%' %
+          (int_10yr_tot_rat))
+
+    # Outstanding principal after first 10 years
+    out_prin_10yr = out_prin_h[10*12-1]
+    print('Outstanding principal after 10 years: $%0.2f' % (out_prin_10yr))
+
+    # Principal paid in 10 years
+    print('Principal paid in 10 years: $%0.2f' % (loan_amt - out_prin_10yr))
 
     if write_amort_flag.upper() == 'Y':
         # write the breakdown into excel file
