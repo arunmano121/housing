@@ -7,6 +7,7 @@ It also assumes fixed mortgage interest rates for the life of loan.
 
 Input parameters
 ----------------
+* Loan type: regular fixed rate loan or interest only loan.
 * Home value: purchase price of home. You can specify in a variety of formats
   like 1000000 or 1,000,000 or 1M or $1M or 1000K, etc.
 * Down payment: down payment that is paid to bank. You can specify in a

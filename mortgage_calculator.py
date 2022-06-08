@@ -249,7 +249,7 @@ def calc_mon_pay(out_prin, months, int_rate):
     return [payment, interest, principal]
 
 
-def calc_schedule(loan_amt, years, int_rate):
+def calc_schedule(loan_amt, years, int_rate, loan_type):
     '''
     Calculate schedule of payments month over month
 
@@ -261,6 +261,8 @@ def calc_schedule(loan_amt, years, int_rate):
         number of years in the loan
     int_rate: float
         fixed interest rate at start of the loan
+    loan_type: str
+        Indicator to specify if the loan is a regular loan or interest only
 
     Returns
     -------
@@ -285,6 +287,11 @@ def calc_schedule(loan_amt, years, int_rate):
         [payment, interest, principal] = \
             calc_mon_pay(out_prin,
                          years*12 - months + 1, int_rate)
+
+        # interest only loan - so set back principal to 0
+        if loan_type == 'I':
+            principal = 0
+            payment = interest
 
         # outstanding principal reduces every month
         out_prin = out_prin - principal
@@ -364,6 +371,9 @@ def main():
     # enter maximum down payment possible
     down_pay = get_valid_input('Down payment: ')
 
+    # regular loan or interest only loan
+    loan_type = str(input('Reg. loan (R) or Int. only (I): '))
+
     # loan term in years
     years = int(input('Loan term (years): '))
 
@@ -397,15 +407,26 @@ def main():
     print('calculating schedule of payments month over month...')
     print('-'*60)
     [pay_h, int_h, prin_h, month_h, out_prin_h] = \
-        calc_schedule(loan_amt, years, int_rate)
+        calc_schedule(loan_amt, years, int_rate, loan_type)
+
+    if loan_type == 'R':
+        print('Regular Loan')
+    else:
+        print('Interest Only Loan')
 
     # loan amount
     print('Loan amount: $%0.2f' % (loan_amt))
 
-    # bank monthly payment is sum of principal and interest
-    mon_bank_pay = pay_h[0]
-    print('Monthly payment to bank (Principal + Interest): $%0.2f'
-          % (mon_bank_pay))
+    if loan_type == 'R':
+        # bank monthly payment is sum of principal and interest
+        mon_bank_pay = pay_h[0]
+        print('Monthly payment to bank (Principal + Interest): $%0.2f'
+              % (mon_bank_pay))
+    else:
+        # bank monthly payment is interest only
+        mon_bank_pay = pay_h[0]
+        print('Monthly payment to bank (Interest): $%0.2f'
+              % (mon_bank_pay))
 
     # total monthly commitment is sum of bank payment, hoa,
     # home ins, prop tax and maintenance
