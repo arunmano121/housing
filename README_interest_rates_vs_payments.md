@@ -10,13 +10,13 @@ could afford at different interest rates given their cap on monthly cash
 outflow and down payment.
     
 The parameters that are involved in calculating the monthly parameters are
-home value, down payment, loan term, interest rate, monthly HOA, maintenance,
-property tax and home insurance (which are roughly based on the property tax
-rates.
+home value, down payment, loan term, regular loan or interest only loan,
+interest rate, monthly HOA, maintenance, property tax and home insurance
+(which are roughly based on the property tax rates.
 
 Input parameters
 ----------------
-
+* Loan type: regular fixed rate loan or interest only loan.
 * Home value (lower bound, upper bound, steps): purchase price of home. You
 can specify in a variety of formats like 1000000 or 1,000,000 or 1M or $1M
 or 1000K, etc. The resulting simulation considers prices between lower and

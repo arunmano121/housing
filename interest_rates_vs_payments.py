@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def calc_mon_pay(out_prin, months, int_rate):
+def calc_mon_pay(out_prin, months, int_rate, loan_type):
     '''
     calculate monthly payment including interest and principal
 
@@ -23,6 +23,8 @@ def calc_mon_pay(out_prin, months, int_rate):
         number of remaining months in loan
     int_rate: float
         fixed interest rate
+    loan_type: str
+        Indicator to specify if the loan is a regular loan or interest only
 
     Returns
     -------
@@ -45,6 +47,11 @@ def calc_mon_pay(out_prin, months, int_rate):
 
     # principal component
     principal = payment - interest
+
+    # interest only loan - so set back principal to 0
+    if loan_type == 'I':
+        principal = 0
+        payment = interest
 
     return [payment, interest, principal]
 
@@ -124,6 +131,9 @@ def main():
     # enter maximum down payment possible
     down_pay = get_valid_input('Enter max possible down payment: ')
 
+    # regular loan or interest only loan
+    loan_type = str(input('Reg. loan (R) or Int. only (I): '))
+
     # loan amount is home value minus down payment
     loan_amt = home_val - down_pay
 
@@ -153,7 +163,7 @@ def main():
 
     # calculate the schedule of payments
     [payment, interest, principal] = \
-        calc_mon_pay(loan_amt, loan_term*12, int_rate)
+        calc_mon_pay(loan_amt, loan_term*12, int_rate, loan_type)
 
     # monthly property tax
     prop_tax = prop_tax_pct / (12*100) * home_val
