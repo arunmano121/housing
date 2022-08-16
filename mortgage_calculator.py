@@ -11,56 +11,37 @@ import xlsxwriter
 import matplotlib.pyplot as plt
 
 
-def visualize_payments(home_val, years, int_rate, mon_hoa, mon_maint,
-                       month_h, int_h, prin_h, tot_int, tot_home_ins,
-                       tot_prop_tax, tot_hoa, tot_maint):
+def visualize_payments(home_param):
     '''
     Plot principal vs interest over life of loan, and proportion of
     amounts over the life of loan.
 
     Parameters
     ----------
-    home_val: float
-        value of the home
-    years: int
-        number of years in the loan
-    int_rate: float
-        fixed interest rate
-    mon_hoa: float
-        monthly HOA and Mello-Roos fees
-    mon_maint: float
-        monthly maintenance fees
-    month_h: list of int
-        list containing month of payment in numbers 1, 2, 3... etc.
-    int_h: list of float
-        list containing the interest paid every month
-    prin_h: list of float
-        list containing the principal paid every month
-    tot_int: float
-        total interest paid over life of loan
-    tot_home_ins: float
-        total home insurance over life of loan
-    tot_prop_tax: float
-        total property tax over life of loan
-    tot_hoa: float
-        total HOA and Mello-Roos over life of loan
-    tot_maint: float
-        total maintenance over life of loan
+    home_param: dict
+        parameters of the home and the calculated quantities
 
     Returns
     -------
     None
     '''
 
+    print('-'*60)
+    print('visualizing payments...')
+    print('-'*60)
+
     fig, ax = plt.subplots(nrows=1, ncols=2)
     fig.suptitle(('Home Value: \\$%0.2fM, Loan Term: %d years, Int Rate: '
                   '%0.2f%%, Monthly HOA/Mello-Roos: \\$%d, Monthly Maint.:'
                   ' \\$%d')
-                 % (home_val/1e6, years, int_rate, mon_hoa, mon_maint))
+                 % (home_param['home_val']/1e6, home_param['years'],
+                    home_param['int_rate'], home_param['mon_hoa'],
+                    home_param['mon_maint']))
 
     # plot stacked bar chart
-    ax[0].bar(month_h, int_h, color='r')
-    ax[0].bar(month_h, prin_h, bottom=int_h, color='b')
+    ax[0].bar(home_param['month_h'], home_param['int_h'], color='r')
+    ax[0].bar(home_param['month_h'], home_param['prin_h'],
+              bottom=home_param['int_h'], color='b')
     ax[0].set_xlabel('Month')
     ax[0].set_ylabel('Principal and Interest ($)')
     ax[0].legend(['Interest', 'Principal'])
@@ -69,8 +50,9 @@ def visualize_payments(home_val, years, int_rate, mon_hoa, mon_maint,
     # pie chart to show the total proportion of amount over life of loan
     labels = ['Interest', 'Home Insurance', 'Home Value', 'HOA',
               'Property Tax', 'Maintenance']
-    items = [tot_int, tot_home_ins, home_val, tot_hoa, tot_prop_tax,
-             tot_maint]
+    items = [home_param['tot_int'], home_param['tot_home_ins'],
+             home_param['home_val'], home_param['tot_hoa'],
+             home_param['tot_prop_tax'], home_param['tot_maint']]
     explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
     ax[1].pie(items, explode=explode, labels=labels, autopct='%1.1f%%',
               shadow=True, startangle=90)
@@ -82,12 +64,7 @@ def visualize_payments(home_val, years, int_rate, mon_hoa, mon_maint,
     return
 
 
-def write_excel(title, month, interest, principal, out_prin,
-                mon_hoa, mon_home_ins, mon_prop_tax, mon_bank_pay,
-                mon_maint, mon_pay, home_val, down_pay, loan_amt,
-                tot_int, tot_prop_tax, tot_home_ins, tot_hoa, tot_maint,
-                tot_pay, int_loan_rat, int_7yr, int_7yr_tot_rat,
-                out_prin_7yr):
+def write_excel(title, home_param):
     '''
     write out payment schedule into excel sheet
 
@@ -95,57 +72,17 @@ def write_excel(title, month, interest, principal, out_prin,
     ----------
     title: str
         name of the excel file
-    month: int
-        numeric month
-    interest: float
-        interest component of the monthly payment
-    principal: float
-        principal component of the monthly payment
-    out_prin: float
-        outstanding principal component owed to bank
-    mon_hoa: float
-        monthly HOA and Mello-Roos fees
-    mon_home_ins: float
-        monthly home insurance
-    mon_prop_tax: float
-        monthly property tax
-    mon_bank_pay: float
-        total monthly payment to bank including principal and interest
-    mon_maint: float
-        total monthly maintenance
-    mon_pay: float
-        total monthly commitment
-    home_val: float
-        value of home
-    down_pay: float
-        downpayment at time of purchase
-    loan_amt: float
-        outstanding loan amount
-    tot_int: float
-        total interest paid over life of loan
-    tot_prop_tax: float
-        total property tax over life of loan
-    tot_home_ins: float
-        total home insurance over life of loan
-    tot_hoa: float
-        total HOA and Mello-Roos over life of loan
-    tot_maint: float
-        total maintenance over life of loan
-    tot_pay: float
-        total payment over life of loan
-    int_loan_rat: float
-        interest to loan amount ratio
-    int_7yr: float
-        interest paid over the first 7 years of loan
-    int_7yr_tot_rat: float
-        ratio of interest paid over 7 years to life time
-    out_prin_7yr: float
-        outstanding principal remaining after 7 years
+    home_param: dict
+        parameters of the home and the calculated quantities
 
     Returns
     -------
     None
     '''
+
+    print('-'*60)
+    print('writing out payment schedule into excel sheet...')
+    print('-'*60)
 
     # file name to write out
     workbook = xlsxwriter.Workbook(title)
@@ -169,17 +106,17 @@ def write_excel(title, month, interest, principal, out_prin,
     worksheet.write(0, 9, 'Out. Principal', fmt)
 
     # write out individual lines of data
-    for i in range(len(month)):
-        worksheet.write(i + 2, 0, month[i])
-        worksheet.write(i + 2, 1, interest[i], money)
-        worksheet.write(i + 2, 2, principal[i], money)
-        worksheet.write(i + 2, 3, mon_hoa, money)
-        worksheet.write(i + 2, 4, mon_home_ins, money)
-        worksheet.write(i + 2, 5, mon_prop_tax, money)
-        worksheet.write(i + 2, 6, mon_maint, money)
-        worksheet.write(i + 2, 7, mon_bank_pay, money)
-        worksheet.write(i + 2, 8, mon_pay, money)
-        worksheet.write(i + 2, 9, out_prin[i], money)
+    for i in range(home_param['years']*12):
+        worksheet.write(i + 2, 0, i+1)
+        worksheet.write(i + 2, 1, home_param['int_h'][i], money)
+        worksheet.write(i + 2, 2, home_param['prin_h'][i], money)
+        worksheet.write(i + 2, 3, home_param['mon_hoa'], money)
+        worksheet.write(i + 2, 4, home_param['mon_home_ins'], money)
+        worksheet.write(i + 2, 5, home_param['mon_prop_tax'], money)
+        worksheet.write(i + 2, 6, home_param['mon_maint'], money)
+        worksheet.write(i + 2, 7, home_param['pay_h'][i], money)
+        worksheet.write(i + 2, 8, home_param['mon_pay'], money)
+        worksheet.write(i + 2, 9, home_param['out_prin_h'][i], money)
 
     worksheet.write('L1', 'Home Value', fmt)
     worksheet.write('L2', 'Down Payment', fmt)
@@ -194,20 +131,26 @@ def write_excel(title, month, interest, principal, out_prin,
     worksheet.write('L11', '7yr Interest', fmt)
     worksheet.write('L12', 'Int 7yr-Total Ratio', fmt)
     worksheet.write('L13', 'Out. Prin. 7yr', fmt)
+    worksheet.write('L14', '10yr Interest', fmt)
+    worksheet.write('L15', 'Int 10yr-Total Ratio', fmt)
+    worksheet.write('L16', 'Out. Prin. 10yr', fmt)
 
-    worksheet.write('M1', home_val, money)
-    worksheet.write('M2', down_pay, money)
-    worksheet.write('M3', loan_amt, money)
-    worksheet.write('M4', tot_int, money)
-    worksheet.write('M5', tot_prop_tax, money)
-    worksheet.write('M6', tot_home_ins, money)
-    worksheet.write('M7', tot_hoa, money)
-    worksheet.write('M8', tot_maint, money)
-    worksheet.write('M9', tot_pay, money)
-    worksheet.write('M10', int_loan_rat/100, pct)
-    worksheet.write('M11', int_7yr, money)
-    worksheet.write('M12', int_7yr_tot_rat/100, pct)
-    worksheet.write('M13', out_prin_7yr, money)
+    worksheet.write('M1', home_param['home_val'], money)
+    worksheet.write('M2', home_param['down_pay'], money)
+    worksheet.write('M3', home_param['loan_amt'], money)
+    worksheet.write('M4', home_param['tot_int'], money)
+    worksheet.write('M5', home_param['tot_prop_tax'], money)
+    worksheet.write('M6', home_param['tot_home_ins'], money)
+    worksheet.write('M7', home_param['tot_hoa'], money)
+    worksheet.write('M8', home_param['tot_maint'], money)
+    worksheet.write('M9', home_param['tot_pay'], money)
+    worksheet.write('M10', home_param['int_loan_rat']/100, pct)
+    worksheet.write('M11', home_param['int_7yr'], money)
+    worksheet.write('M12', home_param['int_7yr_tot_rat']/100, pct)
+    worksheet.write('M13', home_param['out_prin_7yr'], money)
+    worksheet.write('M14', home_param['int_10yr'], money)
+    worksheet.write('M15', home_param['int_10yr_tot_rat']/100, pct)
+    worksheet.write('M16', home_param['out_prin_10yr'], money)
 
     # finished writing - close the workbook
     workbook.close()
@@ -312,6 +255,149 @@ def calc_schedule(loan_amt, years, int_rate, loan_type):
     return [pay_h, int_h, prin_h, month_h, out_prin_h]
 
 
+def compute_mortgage_quantities(home_param):
+    '''
+    based on user inputs for the parameters of the home, and other purchase
+    factors such as HOA, property tax, etc., this function computes the
+    calculated mortgage quantities
+
+    Parameters
+    ----------
+    home_param: dict
+        dictionary that contains the main input quantities and also carries
+        the output and computed entities
+
+    Returns
+    -------
+    home_param: dict
+        dictionary that contains the main input quantities and also carries
+        the output and computed entities
+    '''
+
+    print('-'*60)
+    print('computing mortgage quantities...')
+    print('-'*60)
+
+    # loan amount is home value minus down payment
+    home_param['loan_amt'] = home_param['home_val'] - home_param['down_pay']
+
+    if home_param['loan_type'] == 'R':
+        print('Regular Loan')
+    else:
+        print('Interest Only Loan')
+
+    # loan parameters
+    print('Home value: $%0.2f Down payment: $%0.2f Loan amount: $%0.2f'
+          % (home_param['home_val'], home_param['down_pay'],
+             home_param['loan_amt']))
+
+    # calculate the schedule of payments
+    [home_param['pay_h'], home_param['int_h'], home_param['prin_h'],
+     home_param['month_h'], home_param['out_prin_h']] = \
+        calc_schedule(home_param['loan_amt'], home_param['years'],
+                      home_param['int_rate'], home_param['loan_type'])
+
+    if home_param['loan_type'] == 'R':
+        # bank monthly payment is sum of principal and interest
+        home_param['mon_bank_pay'] = home_param['pay_h'][0]
+        print('Monthly payment to bank (Principal + Interest): $%0.2f'
+              % (home_param['mon_bank_pay']))
+    else:
+        # bank monthly payment is interest only
+        home_param['mon_bank_pay'] = home_param['pay_h'][0]
+        print('Monthly payment to bank (Interest): $%0.2f'
+              % (home_param['mon_bank_pay']))
+
+    # total monthly commitment is sum of bank payment, hoa,
+    # home ins, prop tax and maintenance
+    home_param['mon_pay'] = home_param['mon_bank_pay'] + \
+        home_param['mon_hoa'] + home_param['mon_home_ins'] + \
+        home_param['mon_prop_tax'] + home_param['mon_maint']
+    print('Total monthly commitment: $%0.2f' % (home_param['mon_pay']))
+
+    # total interest over the life of loan
+    home_param['tot_int'] = sum(home_param['int_h'])
+    print('\nTotal interest payment over %d months: $%0.2f' %
+          (home_param['years']*12, home_param['tot_int']))
+
+    # total property tax over the life of loan
+    home_param['tot_prop_tax'] = home_param['mon_prop_tax'] * \
+        12 * home_param['years']
+    print('Total taxes over the %d months: $%0.2f' %
+          (home_param['years']*12, home_param['tot_prop_tax']))
+
+    # total home insurance over the life of loan
+    home_param['tot_home_ins'] = home_param['mon_home_ins'] * 12 * \
+        home_param['years']
+    print('Total home insurance over the %d months: $%0.2f' %
+          (home_param['years']*12, home_param['tot_home_ins']))
+
+    # total HOA over the life of loan
+    home_param['tot_hoa'] = home_param['mon_hoa'] * \
+        12 * home_param['years']
+    print('Total HOA/Mello-Roos over the %d months: $%0.2f' %
+          (home_param['years']*12, home_param['tot_hoa']))
+
+    # total maintenance over the life of loan
+    home_param['tot_maint'] = home_param['mon_maint'] * \
+        12 * home_param['years']
+    print('Total maintenance over the %d months: $%0.2f' %
+          (home_param['years']*12, home_param['tot_maint']))
+
+    # total payment over the life of loan
+    home_param['tot_pay'] = home_param['down_pay'] + home_param['years'] * \
+        12 * home_param['mon_pay']
+    print('Total payment over the %d months: $%0.2f' %
+          (home_param['years']*12, home_param['tot_pay']))
+
+    # ratio of interest to money borrowed from bank
+    home_param['int_loan_rat'] = home_param['tot_int'] /\
+        home_param['loan_amt']*100
+    print('\nInterest-Loan Ratio: %0.2f%%' % (home_param['int_loan_rat']))
+
+    # interest that is paid over the first 7 years
+    home_param['int_7yr'] = sum(home_param['int_h'][0:7*12])
+    print('\nInterest paid over the first 7 years: $%0.2f'
+          % (home_param['int_7yr']))
+
+    # Proportion of interest that is paid over the first 7 years
+    home_param['int_7yr_tot_rat'] = home_param['int_7yr'] / \
+        home_param['tot_int'] * 100
+    print('Proportion of total interest paid in first 7 years: %0.2f%%' %
+          (home_param['int_7yr_tot_rat']))
+
+    # Outstanding principal after first 7 years
+    home_param['out_prin_7yr'] = home_param['out_prin_h'][7*12-1]
+    print('Outstanding principal after 7 years: $%0.2f'
+          % (home_param['out_prin_7yr']))
+
+    # Principal paid in 7 years
+    print('Principal paid in 7 years: $%0.2f'
+          % (home_param['loan_amt'] - home_param['out_prin_7yr']))
+
+    # interest that is paid over the first 10 years
+    home_param['int_10yr'] = sum(home_param['int_h'][0:10*12])
+    print('\nInterest paid over the first 10 years: $%0.2f'
+          % (home_param['int_10yr']))
+
+    # Proportion of interest that is paid over the first 10 years
+    home_param['int_10yr_tot_rat'] = home_param['int_10yr'] / \
+        home_param['tot_int'] * 100
+    print('Proportion of total interest paid in first 10 years: %0.2f%%' %
+          (home_param['int_10yr_tot_rat']))
+
+    # Outstanding principal after first 10 years
+    home_param['out_prin_10yr'] = home_param['out_prin_h'][10*12-1]
+    print('Outstanding principal after 10 years: $%0.2f'
+          % (home_param['out_prin_10yr']))
+
+    # Principal paid in 10 years
+    print('Principal paid in 10 years: $%0.2f'
+          % (home_param['loan_amt'] - home_param['out_prin_10yr']))
+
+    return home_param
+
+
 def get_valid_input(msg):
     '''
     gets valid inputs for the home prices or down payments in a variety of
@@ -353,6 +439,71 @@ def get_valid_input(msg):
     return val
 
 
+def get_inputs(home_param):
+    '''
+    gets user inputs for the parameters of the home, and other purchase
+    factors such as HOA, property tax, etc.
+
+    Parameters
+    ----------
+    home_param: dict
+        dictionary that contains the main input quantities and also carries
+        the output and computed entities
+
+    Returns
+    -------
+    home_param: dict
+        dictionary that contains the main input quantities and also carries
+        the output and computed entities
+    write_amort_flag: bool
+        flag that indicates if amortization table needs to be computed
+    visualize_amort_flag: bool
+        flag to indicate if amortization needs to be visualized
+    '''
+
+    # home value
+    home_param['home_val'] = get_valid_input('Home value: ')
+
+    # downpayment - typically less than 30% of home value or amount
+    # enter maximum down payment possible
+    home_param['down_pay'] = get_valid_input('Down payment: ')
+
+    # regular loan or interest only loan
+    home_param['loan_type'] = str(input('Reg. loan (R) or Int. only (I): '))
+
+    # loan term in years
+    home_param['years'] = int(input('Loan term (years): '))
+
+    # interest rate
+    home_param['int_rate'] = float(input('Interest rate (%): '))
+
+    # Monthly HOA and Mello-Roos
+    home_param['mon_hoa'] = int(input('Monthly HOA and Mello-Roos ($): '))
+
+    # Monthly maintenance
+    home_param['mon_maint'] = int(input('Monthly maintenance ($): '))
+
+    # monthly property tax - typically around 1.25% in San Diego, CA area
+    home_param['prop_tax_pct'] = \
+        float(input('Property tax percentage (%): '))
+
+    # monthly property tax
+    home_param['mon_prop_tax'] = home_param['home_val'] * \
+        home_param['prop_tax_pct'] / 100 / 12
+
+    # typical monthly home insurance
+    home_param['mon_home_ins'] = home_param['home_val'] * \
+        home_param['prop_tax_pct'] / 100 / 10 / 12
+
+    # write out amortization schedule
+    write_amort_flag = input('Write amortization schedule (y/n): ')
+
+    # visualize amortization schedule
+    visualize_amort_flag = input('Visualize amortization schedule (y/n): ')
+
+    return home_param, write_amort_flag, visualize_amort_flag
+
+
 def main():
     '''
     Calculates the schedule of payments given mortgage parameters.
@@ -364,165 +515,25 @@ def main():
     excel file.
     '''
 
-    # home value
-    home_val = get_valid_input('Home value: ')
+    # dictionary to store the essential parameters
+    home_param = {}
 
-    # downpayment - typically less than 30% of home value or amount
-    # enter maximum down payment possible
-    down_pay = get_valid_input('Down payment: ')
+    # get inputs
+    home_param, write_amort_flag, visualize_amort_flag = \
+        get_inputs(home_param)
 
-    # regular loan or interest only loan
-    loan_type = str(input('Reg. loan (R) or Int. only (I): '))
-
-    # loan term in years
-    years = int(input('Loan term (years): '))
-
-    # interest rate
-    int_rate = float(input('Interest rate (%): '))
-
-    # loan amount is home value minus down payment
-    loan_amt = home_val - down_pay
-
-    # Monthly HOA and Mello-Roos
-    mon_hoa = int(input('Monthly HOA and Mello-Roos ($): '))
-
-    # Monthly maintenance
-    mon_maint = int(input('Monthly maintenance ($): '))
-
-    # monthly property tax - typically around 1.25% in San Diego, CA area
-    prop_tax_pct = float(input('Property tax percentage (%): '))
-    # monthly property tax
-    mon_prop_tax = home_val * prop_tax_pct / 100 / 12
-    # typical monthly home insurance
-    mon_home_ins = home_val * prop_tax_pct / 100 / 10 / 12
-
-    # write out amortization schedule
-    write_amort_flag = input('Write amortization schedule (y/n): ')
-
-    # visualize amortization schedule
-    visualize_amort_flag = input('Visualize amortization schedule (y/n): ')
-
-    # calculate the schedule of payments
-    print('-'*60)
-    print('calculating schedule of payments month over month...')
-    print('-'*60)
-    [pay_h, int_h, prin_h, month_h, out_prin_h] = \
-        calc_schedule(loan_amt, years, int_rate, loan_type)
-
-    if loan_type == 'R':
-        print('Regular Loan')
-    else:
-        print('Interest Only Loan')
-
-    # loan amount
-    print('Loan amount: $%0.2f' % (loan_amt))
-
-    if loan_type == 'R':
-        # bank monthly payment is sum of principal and interest
-        mon_bank_pay = pay_h[0]
-        print('Monthly payment to bank (Principal + Interest): $%0.2f'
-              % (mon_bank_pay))
-    else:
-        # bank monthly payment is interest only
-        mon_bank_pay = pay_h[0]
-        print('Monthly payment to bank (Interest): $%0.2f'
-              % (mon_bank_pay))
-
-    # total monthly commitment is sum of bank payment, hoa,
-    # home ins, prop tax and maintenance
-    mon_pay = mon_bank_pay + \
-        mon_hoa + mon_home_ins + mon_prop_tax + mon_maint
-    print('Total monthly commitment: $%0.2f' % (mon_pay))
-
-    # total interest over the life of loan
-    tot_int = sum(int_h)
-    print('\nTotal interest payment over %d months: $%0.2f' %
-          (years*12, tot_int))
-
-    # total property tax over the life of loan
-    tot_prop_tax = mon_prop_tax*12*years
-    print('Total taxes over the %d months: $%0.2f' %
-          (years*12, tot_prop_tax))
-
-    # total home insurance over the life of loan
-    tot_home_ins = mon_home_ins*12*years
-    print('Total home insurance over the %d months: $%0.2f' %
-          (years*12, tot_home_ins))
-
-    # total HOA over the life of loan
-    tot_hoa = mon_hoa*12*years
-    print('Total HOA/Mello-Roos over the %d months: $%0.2f' %
-          (years*12, tot_hoa))
-
-    # total maintenance over the life of loan
-    tot_maint = mon_maint*12*years
-    print('Total maintenance over the %d months: $%0.2f' %
-          (years*12, tot_maint))
-
-    # total payment over the life of loan
-    tot_pay = down_pay + years*12*mon_pay
-    print('Total payment over the %d months: $%0.2f' %
-          (years*12, tot_pay))
-
-    # ratio of interest to money borrowed from bank
-    int_loan_rat = tot_int/loan_amt*100
-    print('\nInterest-Loan Ratio: %0.2f%%' % (int_loan_rat))
-
-    # interest that is paid over the first 7 years
-    int_7yr = sum(int_h[0:7*12])
-    print('\nInterest paid over the first 7 years: $%0.2f' % (int_7yr))
-
-    # Proportion of interest that is paid over the first 7 years
-    int_7yr_tot_rat = int_7yr / tot_int * 100
-    print('Proportion of total interest paid in first 7 years: %0.2f%%' %
-          (int_7yr_tot_rat))
-
-    # Outstanding principal after first 7 years
-    out_prin_7yr = out_prin_h[7*12-1]
-    print('Outstanding principal after 7 years: $%0.2f' % (out_prin_7yr))
-
-    # Principal paid in 7 years
-    print('Principal paid in 7 years: $%0.2f' % (loan_amt - out_prin_7yr))
-
-    # interest that is paid over the first 10 years
-    int_10yr = sum(int_h[0:10*12])
-    print('\nInterest paid over the first 10 years: $%0.2f' % (int_10yr))
-
-    # Proportion of interest that is paid over the first 10 years
-    int_10yr_tot_rat = int_10yr / tot_int * 100
-    print('Proportion of total interest paid in first 10 years: %0.2f%%' %
-          (int_10yr_tot_rat))
-
-    # Outstanding principal after first 10 years
-    out_prin_10yr = out_prin_h[10*12-1]
-    print('Outstanding principal after 10 years: $%0.2f' % (out_prin_10yr))
-
-    # Principal paid in 10 years
-    print('Principal paid in 10 years: $%0.2f' % (loan_amt - out_prin_10yr))
+    # computing mortgage quantities
+    home_param = compute_mortgage_quantities(home_param)
 
     if write_amort_flag.upper() == 'Y':
         # write the breakdown into excel file
-        print('-'*60)
-        print('writing out payment schedule into excel sheet...')
-        print('-'*60)
-
-        # title for the excel file
-        title = 'monthly_schedule.xlsx'
-
-        # todo: condense necessary items to be written into excel using dict
-        write_excel(title, month_h, int_h, prin_h, out_prin_h,
-                    mon_hoa, mon_home_ins, mon_prop_tax, mon_bank_pay,
-                    mon_maint, mon_pay, home_val, down_pay, loan_amt,
-                    tot_int, tot_prop_tax, tot_home_ins, tot_hoa, tot_maint,
-                    tot_pay, int_loan_rat, int_7yr, int_7yr_tot_rat,
-                    out_prin_7yr)
+        title = 'monthly_schedule.xlsx'  # title for the excel file
+        write_excel(title, home_param)
 
     if visualize_amort_flag.upper() == 'Y':
         # plot principal vs interest over life of loan, and proportion of
         # amounts over the life of loan
-        visualize_payments(home_val, years, int_rate, mon_hoa, mon_maint,
-                           month_h, int_h, prin_h, tot_int, tot_home_ins,
-                           tot_prop_tax, tot_hoa, tot_maint)
+        visualize_payments(home_param)
 
 
 if __name__ == '__main__':
